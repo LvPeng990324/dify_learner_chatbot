@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkBreaks from 'remark-breaks'
 import { useChat } from '../store/chat'
 
 function Avatar({ variant }) {
@@ -35,7 +36,7 @@ function AssistantBubble({ content, streaming }) {
       <Avatar variant="assistant" />
       <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white px-4 py-3 shadow-sm md:max-w-[75%]">
         <div className={`markdown-body text-sm text-gray-800 ${streaming ? 'stream-cursor' : ''}`}>
-          {content ? <ReactMarkdown>{content}</ReactMarkdown> : (
+          {content ? <ReactMarkdown remarkPlugins={[remarkBreaks]}>{content}</ReactMarkdown> : (
             <span className="text-gray-400">正在思考…</span>
           )}
         </div>
