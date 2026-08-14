@@ -121,6 +121,23 @@ app.get('/api/conversations/:id/messages', authRequired, (req, res) => {
   res.json(rows);
 });
 
+// ---------- 应用参数（开场白等） ----------
+// 透传 Dify GET /parameters，目前只用到 opening_statement；
+// Dify 侧失败时返回空串，前端静默降级为空状态页
+app.get('/api/parameters', authRequired, ah(async (req, res) => {
+  try {
+    const resp = await fetch(difyUrl('/parameters'), {
+      headers: { Authorization: `Bearer ${process.env.API_KEY}` },
+    });
+    if (!resp.ok) throw new Error(`Dify 请求失败 (${resp.status})`);
+    const data = await resp.json();
+    res.json({ opening_statement: data.opening_statement || '' });
+  } catch (e) {
+    console.error('[parameters]', e.message);
+    res.json({ opening_statement: '' });
+  }
+}));
+
 // ---------- 聊天（SSE 流式转发 Dify） ----------
 app.post('/api/chat', authRequired, ah(async (req, res) => {
   const { conversation_id, content } = req.body || {};

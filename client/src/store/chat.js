@@ -20,8 +20,29 @@ export const useChat = create((set, get) => ({
       if (selectFirst && get().activeId === null && list.length > 0) {
         await get().selectConversation(list[0].id)
       }
+      // 没有选中任何会话（停留在「新会话」页）时加载开场白
+      if (get().activeId === null) get().loadOpening()
     } finally {
       set({ loadingConversations: false })
+    }
+  },
+
+  // 拉取 Dify 开场白，作为新会话的第一条本地 assistant 消息（不落库）
+  async loadOpening() {
+    try {
+      const data = await request('/parameters')
+      const content = (data?.opening_statement || '').trim()
+      if (!content) return
+      // 仅在仍处于新会话且消息为空时展示，避免覆盖用户中途的操作
+      if (get().activeId === null && get().messages.length === 0) {
+        set({
+          messages: [
+            { id: 'opening', role: 'assistant', content, created_at: new Date().toISOString() },
+          ],
+        })
+      }
+    } catch {
+      /* 开场白加载失败静默降级为空状态页 */
     }
   },
 
@@ -40,6 +61,7 @@ export const useChat = create((set, get) => ({
   newConversation() {
     if (get().streaming) return
     set({ activeId: null, messages: [], streamError: null })
+    get().loadOpening()
   },
 
   async renameConversation(id, title) {
@@ -56,6 +78,8 @@ export const useChat = create((set, get) => ({
       conversations: s.conversations.filter((c) => c.id !== id),
       ...(wasActive ? { activeId: null, messages: [] } : {}),
     }))
+    // 删除当前会话后回到「新会话」页，同样展示开场白
+    if (wasActive) get().loadOpening()
   },
 
   async send(content) {
