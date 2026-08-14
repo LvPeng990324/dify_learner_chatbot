@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { db, runMigrations } from './db.js';
 import { signToken, authRequired, adminRequired } from './auth.js';
-import { difyUrl, difyUser, deleteDifyConversation } from './dify.js';
+import { difyUrl, difyUser } from './dify.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -94,22 +94,19 @@ app.patch('/api/conversations/:id', authRequired, (req, res) => {
   res.json(db.prepare('SELECT * FROM conversations WHERE id = ?').get(conv.id));
 });
 
-// 删除会话：本地级联删除 + 尽力删除 Dify 侧会话
-async function removeConversation(conv) {
+// 删除会话：仅删除本地记录（级联删消息），Dify 侧会话保留作日志
+function removeConversation(conv) {
   db.prepare('DELETE FROM conversations WHERE id = ?').run(conv.id);
-  if (conv.dify_conversation_id) {
-    await deleteDifyConversation(conv.dify_conversation_id, difyUser(conv.user_id));
-  }
 }
 
-app.delete('/api/conversations/:id', authRequired, ah(async (req, res) => {
+app.delete('/api/conversations/:id', authRequired, (req, res) => {
   const conv = db
     .prepare('SELECT * FROM conversations WHERE id = ? AND user_id = ?')
     .get(req.params.id, req.user.id);
   if (!conv) return err(res, 404, '会话不存在');
-  await removeConversation(conv);
+  removeConversation(conv);
   res.json({ ok: true });
-}));
+});
 
 app.get('/api/conversations/:id/messages', authRequired, (req, res) => {
   const conv = db
@@ -171,20 +168,20 @@ app.post('/api/chat', authRequired, ah(async (req, res) => {
 
   try {
     const resp = await fetch(difyUrl('/chat-messages'), {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${process.env.API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: content,
-        inputs: {},
-        response_mode: 'streaming',
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${process.env.API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: content,
+          inputs: {},
+          response_mode: 'streaming',
         user: difyUser(req.user.id),
         ...(difyConvId ? { conversation_id: difyConvId } : {}),
-      }),
-    });
+        }),
+      });
 
     if (!resp.ok || !resp.body) {
       const text = await resp.text().catch(() => '');
@@ -351,12 +348,12 @@ app.get('/api/admin/conversations/:id/messages', authRequired, adminRequired, (r
   res.json(rows);
 });
 
-app.delete('/api/admin/conversations/:id', authRequired, adminRequired, ah(async (req, res) => {
+app.delete('/api/admin/conversations/:id', authRequired, adminRequired, (req, res) => {
   const conv = db.prepare('SELECT * FROM conversations WHERE id = ?').get(req.params.id);
   if (!conv) return err(res, 404, '会话不存在');
-  await removeConversation(conv);
+  removeConversation(conv);
   res.json({ ok: true });
-}));
+});
 
 // ---------- 生产模式：托管前端构建产物 ----------
 const clientDist = path.resolve(__dirname, '../../client/dist');
