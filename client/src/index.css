@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-gray-100 text-gray-800 antialiased;
+}
+
+/* 消息区 markdown 基础排版 */
+.markdown-body p {
+  @apply my-2 leading-7;
+}
+.markdown-body p:first-child {
+  @apply mt-0;
+}
+.markdown-body p:last-child {
+  @apply mb-0;
+}
+.markdown-body pre {
+  @apply my-2 overflow-x-auto rounded-lg bg-gray-800 p-3 text-sm text-gray-100;
+}
+.markdown-body code {
+  @apply rounded bg-gray-200 px-1 py-0.5 text-sm text-gray-800;
+}
+.markdown-body pre code {
+  @apply bg-transparent p-0 text-gray-100;
+}
+.markdown-body ul {
+  @apply my-2 list-disc pl-6;
+}
+.markdown-body ol {
+  @apply my-2 list-decimal pl-6;
+}
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  @apply my-3 font-semibold;
+}
+.markdown-body h1 {
+  @apply text-xl;
+}
+.markdown-body h2 {
+  @apply text-lg;
+}
+.markdown-body h3 {
+  @apply text-base;
+}
+.markdown-body a {
+  @apply text-blue-600 underline;
+}
+.markdown-body blockquote {
+  @apply my-2 border-l-4 border-gray-300 pl-3 text-gray-500;
+}
+.markdown-body table {
+  @apply my-2 border-collapse;
+}
+.markdown-body th,
+.markdown-body td {
+  @apply border border-gray-300 px-3 py-1;
+}
+
+/* 流式生成中的光标 */
+.stream-cursor::after {
+  content: '▍';
+  @apply ml-0.5 inline-block animate-pulse text-gray-400;
+}

@@ -1,0 +1,18 @@
+{
+  "name": "dify-learner-chatbot-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "接入自建 Dify chatflow 的对话平台后端",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
