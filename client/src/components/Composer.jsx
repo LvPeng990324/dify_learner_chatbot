@@ -45,7 +45,7 @@ export default function Composer() {
             autoGrow()
           }}
           onKeyDown={onKeyDown}
-          placeholder={streaming ? '生成中，请稍候…' : '输入你的问题，Enter 发送，Shift+Enter 换行'}
+          placeholder={streaming ? '生成中，请稍候…' : '请描述学生的情况，越具体越好：如年级、学科表现、学习习惯、情绪状态、遇到问题、家庭环境等'}
           disabled={streaming}
           className="max-h-40 flex-1 resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm leading-6 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50"
         />

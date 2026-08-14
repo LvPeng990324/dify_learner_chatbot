@@ -2,9 +2,37 @@ import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useChat } from '../store/chat'
 
+function Avatar({ variant }) {
+  const isAssistant = variant === 'assistant'
+  return (
+    <div
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${
+        isAssistant ? 'bg-white text-gray-500' : 'bg-blue-600 text-white'
+      }`}
+    >
+      {isAssistant ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 8V4H8" />
+          <rect width="16" height="12" x="4" y="8" rx="2" />
+          <path d="M2 14h2" />
+          <path d="M20 14h2" />
+          <path d="M15 13v2" />
+          <path d="M9 13v2" />
+        </svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      )}
+    </div>
+  )
+}
+
 function AssistantBubble({ content, streaming }) {
   return (
-    <div className="flex justify-start">
+    <div className="flex items-start justify-start gap-2">
+      <Avatar variant="assistant" />
       <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white px-4 py-3 shadow-sm md:max-w-[75%]">
         <div className={`markdown-body text-sm text-gray-800 ${streaming ? 'stream-cursor' : ''}`}>
           {content ? <ReactMarkdown>{content}</ReactMarkdown> : (
@@ -18,10 +46,11 @@ function AssistantBubble({ content, streaming }) {
 
 function UserBubble({ content }) {
   return (
-    <div className="flex justify-end">
+    <div className="flex items-start justify-end gap-2">
       <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 text-sm leading-7 text-white md:max-w-[75%]">
         {content}
       </div>
+      <Avatar variant="user" />
     </div>
   )
 }
