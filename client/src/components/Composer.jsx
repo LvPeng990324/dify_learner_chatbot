@@ -11,8 +11,10 @@ export default function Composer() {
   const autoGrow = () => {
     const ta = taRef.current
     if (!ta) return
+    // 只在内容变多时自动长高，不主动缩回，避免覆盖用户手动拖拽的高度
+    const current = ta.clientHeight
     ta.style.height = 'auto'
-    ta.style.height = `${Math.min(ta.scrollHeight, MAX_HEIGHT)}px`
+    ta.style.height = `${Math.max(current, Math.min(ta.scrollHeight, MAX_HEIGHT))}px`
   }
 
   const doSend = async () => {
@@ -26,8 +28,8 @@ export default function Composer() {
   }
 
   const onKeyDown = (e) => {
-    // Enter 发送，Shift+Enter 换行；输入法组词期间不触发
-    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+    // Ctrl+Enter 发送，Enter 换行；输入法组词期间不触发
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.nativeEvent.isComposing) {
       e.preventDefault()
       doSend()
     }
@@ -38,16 +40,16 @@ export default function Composer() {
       <div className="mx-auto flex max-w-3xl items-end space-x-2 md:max-w-5xl xl:max-w-6xl">
         <textarea
           ref={taRef}
-          rows={1}
+          rows={2}
           value={value}
           onChange={(e) => {
             setValue(e.target.value)
             autoGrow()
           }}
           onKeyDown={onKeyDown}
-          placeholder={streaming ? '生成中，请稍候…' : '请描述学生的情况，越具体越好：如年级、学科表现、学习习惯、情绪状态、遇到问题、家庭环境等'}
+          placeholder={streaming ? '生成中，请稍候…' : '请描述学生的情况，越具体越好：如年级、学科表现、学习习惯、情绪状态、遇到问题、家庭环境等（Ctrl+Enter 发送，Enter 换行）'}
           disabled={streaming}
-          className="max-h-40 flex-1 resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm leading-6 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50"
+          className="max-h-[50vh] flex-1 resize-y overflow-y-auto rounded-xl border border-gray-300 px-3 py-2 text-sm leading-6 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50"
         />
         {/* 预留：后续可在此追加其他操作按钮 */}
         <button

@@ -74,7 +74,7 @@ export default function MessageList() {
         <div className="text-center">
           <div className="mb-2 text-4xl">💬</div>
           <p className="text-gray-500">{activeId === null ? '开始一个新的会话吧' : '这个会话还没有消息'}</p>
-          <p className="mt-1 text-sm text-gray-400">在下方输入你的问题，按 Enter 发送</p>
+          <p className="mt-1 text-sm text-gray-400">在下方输入你的问题，按 Ctrl+Enter 发送</p>
         </div>
       </div>
     )
