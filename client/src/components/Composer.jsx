@@ -35,7 +35,7 @@ export default function Composer() {
 
   return (
     <div className="border-t border-gray-200 bg-white px-4 py-3 md:px-8">
-      <div className="mx-auto flex max-w-3xl items-end space-x-2">
+      <div className="mx-auto flex max-w-3xl items-end space-x-2 md:max-w-5xl xl:max-w-6xl">
         <textarea
           ref={taRef}
           rows={1}
